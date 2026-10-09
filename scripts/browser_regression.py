@@ -143,6 +143,11 @@ def main() -> None:
             artifact_text = driver.find_element(By.ID, "safe-artifact").text
             assert "Не делать" in artifact_text and "Сделать" in artifact_text
             assert "Вопросы уполномоченному специалисту" in artifact_text
+            assert "Можно продолжить" in artifact_text
+            assert "Только при выполнении условий" in artifact_text
+            assert "Остановиться и согласовать" in artifact_text
+            assert "Передача" in artifact_text
+        assert len(driver.find_elements(By.CSS_SELECTOR, ".route-legend > div")) == 3
         assert "обучающими примерами" in driver.find_element(By.CSS_SELECTOR, ".safety-note").text
 
         open_step(9, "презентацию защиты")
