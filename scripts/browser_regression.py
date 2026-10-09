@@ -111,7 +111,7 @@ def main() -> None:
         assert "Матрица построена" in driver.find_element(By.ID, "class-status").text
         assert "проверка сотрудником" in driver.find_element(By.ID, "class-artifact").text
 
-        open_step(7, "Допустимый контур")
+        open_step(7, "Сначала распознайте")
         driver.find_element(By.ID, "safe-response").send_keys("Ответ без таблицы")
         click(By.ID, "safe-build")
         assert "Не найдена таблица" in driver.find_element(By.ID, "safe-status").text
@@ -130,7 +130,10 @@ def main() -> None:
         driver.execute_script("arguments[0].value = arguments[1]", driver.find_element(By.ID, "safe-response"), legacy_answer)
         click(By.ID, "safe-build")
         assert "Предварительное заключение извлечено" in driver.find_element(By.ID, "safe-status").text
-        expected_tones = {"public": "green", "personal": "amber", "special": "red", "restricted": "red", "prohibited": "red"}
+        assert not driver.find_elements(By.ID, "safe-level")
+        assert driver.find_element(By.ID, "safe-situation").is_displayed()
+        assert "Сравнить цены" in driver.find_element(By.CSS_SELECTOR, ".scenario-tabs").text
+        expected_tones = {"price": "green", "birthday": "amber", "appeal": "amber", "health": "red", "memo": "red", "secret": "red"}
         for scenario, tone in expected_tones.items():
             click(By.CSS_SELECTOR, f'[data-security="{scenario}"]')
             click(By.ID, "safe-example")
@@ -140,7 +143,7 @@ def main() -> None:
             artifact_text = driver.find_element(By.ID, "safe-artifact").text
             assert "Не делать" in artifact_text and "Сделать" in artifact_text
             assert "Вопросы уполномоченному специалисту" in artifact_text
-        assert "реальные персональные" in driver.find_element(By.CSS_SELECTOR, ".safety-note").text
+        assert "обучающими примерами" in driver.find_element(By.CSS_SELECTOR, ".safety-note").text
 
         open_step(9, "презентацию защиты")
         click(By.ID, "pilot-example")

@@ -175,11 +175,9 @@ p { margin-top: 0; }
 .safety-note { display: flex; align-items: flex-start; gap: var(--space-4); padding: var(--space-4); border: 1px solid #e0b35a; border-radius: var(--radius-sm); background: #fff8e8; }
 .safety-note b { min-width: 300px; color: #7c5200; }
 .safety-note span { color: #5f5543; }
-.scenario-tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-2); }
+.scenario-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); }
 .scenario-tabs button { display: flex; min-height: 58px; align-items: center; gap: var(--space-2); border: 1px solid var(--color-line); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); background: #fff; color: var(--color-ink); text-align: left; cursor: pointer; }
-.scenario-tabs button span { width: 10px; height: 10px; flex: 0 0 auto; border-radius: 50%; background: var(--color-green); }
-.scenario-tabs button:nth-child(2) span, .scenario-tabs button:nth-child(3) span { background: #d19222; }
-.scenario-tabs button:nth-child(4) span, .scenario-tabs button:nth-child(5) span { background: var(--color-danger); }
+.scenario-tabs button span { width: 10px; height: 10px; flex: 0 0 auto; border-radius: 50%; background: var(--color-blue); }
 .scenario-tabs button.active { border-color: var(--color-navy); box-shadow: inset 0 0 0 2px var(--color-navy); font-weight: 750; }
 .security-result { display: grid; gap: var(--space-4); margin-top: var(--space-4); }
 .security-card { overflow: hidden; border: 1px solid var(--color-line); border-radius: var(--radius-md); background: #fff; }
