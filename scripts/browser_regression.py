@@ -31,6 +31,16 @@ def main() -> None:
 
     try:
         open_step(1, "Показатель")
+        assert not driver.find_elements(By.XPATH, "//button[contains(normalize-space(.), 'Сформировать')]")
+        composer = driver.find_element(By.ID, "metric-prompt-composer")
+        assert composer.find_element(By.CSS_SELECTOR, ".prompt-open").get_attribute("href") == "https://gosprompt.ru/"
+        before = composer.find_element(By.CSS_SELECTOR, ".prompt-preview").text
+        driver.execute_script("arguments[0].value = 'код; период; значение'; arguments[0].dispatchEvent(new Event('input', {bubbles:true}))", driver.find_element(By.ID, "metric-fields"))
+        assert composer.find_element(By.CSS_SELECTOR, ".prompt-preview").text != before
+        assert composer.find_elements(By.CSS_SELECTOR, ".prompt-value")
+        click(By.CSS_SELECTOR, "#metric-prompt-composer [data-prompt-mode='template']")
+        assert composer.find_elements(By.CSS_SELECTOR, ".prompt-variable")
+        click(By.CSS_SELECTOR, "#metric-prompt-composer [data-prompt-mode='filled']")
         click(By.ID, "metric-example")
         click(By.ID, "metric-check")
         assert "Структура принята" in driver.find_element(By.ID, "metric-status").text
@@ -59,7 +69,7 @@ def main() -> None:
         assert "1.8 п.п." in driver.find_element(By.CSS_SELECTOR, ".metric-row").text
         assert "-1.4…+5.1" in driver.find_element(By.CSS_SELECTOR, ".panel").text
 
-        open_step(6, "Большой массив")
+        open_step(6, "Большой набор")
         for mode in ("excel", "sheets"):
             click(By.CSS_SELECTOR, f'[data-auto="{mode}"]')
             click(By.ID, "auto-reference")
