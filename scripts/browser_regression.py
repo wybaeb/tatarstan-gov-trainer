@@ -56,12 +56,15 @@ def main() -> None:
         assert "Как выполняется пересчёт" in driver.find_element(By.CSS_SELECTOR, ".method").get_attribute("textContent")
 
         open_step(3, "Повторяющиеся циклы")
-        for stage in range(5):
+        trend_directions = []
+        for stage in range(4):
             click(By.CSS_SELECTOR, f'[data-season="{stage}"]')
             assert driver.find_elements(By.CSS_SELECTOR, ".chart polyline")
-        assert "снизился на 16%" in driver.find_element(By.CSS_SELECTOR, ".thesis").text
+            trend_directions.append("up" if driver.find_elements(By.CSS_SELECTOR, ".trend-result.up") else "down")
+        assert trend_directions == ["up", "down", "up", "down"]
+        assert "итоговый слабый спад" in driver.find_element(By.CSS_SELECTOR, ".thesis").text
         assert "Дата наблюдения" in driver.find_element(By.CSS_SELECTOR, ".chart").text
-        assert "Как разделены" in driver.find_element(By.CSS_SELECTOR, ".method").get_attribute("textContent")
+        assert "Как устроен учебный расчёт" in driver.find_element(By.CSS_SELECTOR, ".method").get_attribute("textContent")
 
         open_step(4, "Прогноз проверяется")
         frame = driver.find_element(By.CSS_SELECTOR, "iframe.forecast-frame")
@@ -77,13 +80,15 @@ def main() -> None:
         assert "День эксперимента" in driver.find_element(By.CSS_SELECTOR, ".chart").text
         assert "Как читать доверительный интервал" in driver.find_element(By.CSS_SELECTOR, ".method").get_attribute("textContent")
 
-        open_step(6, "Большой набор")
-        for mode in ("excel", "sheets"):
+        open_step(6, "Расчёт начинается")
+        for mode in ("formula", "excel", "sheets"):
             click(By.CSS_SELECTOR, f'[data-auto="{mode}"]')
             click(By.ID, "auto-reference")
             wait.until(lambda d: "Все обязательные признаки" in d.find_element(By.ID, "auto-status").text)
             assert not driver.find_elements(By.CSS_SELECTOR, ".check.fail")
         assert len(driver.find_elements(By.CSS_SELECTOR, 'a[download]')) == 2
+        click(By.CSS_SELECTOR, '[data-auto="excel"]')
+        assert driver.find_element(By.CSS_SELECTOR, 'a[download]').get_attribute("href").endswith(".xlsm")
 
         open_step(7, "утверждает маршрут")
         driver.execute_script(
