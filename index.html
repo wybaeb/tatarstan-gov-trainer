@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Практикум: данные и ИИ в государственном управлении</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <p class="eyebrow">Республика Татарстан · учебный практикум</p>
+    <h1>Данные и искусственный интеллект<br>в управленческой практике</h1>
+    <p class="lead">Шесть последовательных заданий: от постановки измеримой задачи до паспорта ограниченного пилота и его защиты.</p>
+    <div class="notice">Все сведения ниже — <strong>обучающие примеры</strong>. Они не описывают фактическую работу организаций, должностных лиц или населённых пунктов.</div>
+  </header>
+
+  <main>
+    <section class="method" aria-label="Порядок работы">
+      <div><b>Порядок работы</b><span>1. Заполните поля</span><span>2. Скопируйте запрос</span><span>3. Вставьте его в доступный ИИ‑сервис</span><span>4. Вставьте структурированный ответ и проверьте его</span></div>
+      <p>В учебном занятии запросы выполняются в Госпромпте. Сейчас тренажёр работает автономно: ключи доступа и рабочие данные в него не передаются.</p>
+    </section>
+    <nav id="case-nav" class="case-nav" aria-label="Задания"></nav>
+    <section id="case" class="case" aria-live="polite"></section>
+  </main>
+
+  <template id="field-template">
+    <label class="field"><span></span><textarea rows="3"></textarea></label>
+  </template>
+  <script src="app.js"></script>
+</body>
+</html>
