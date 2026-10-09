@@ -115,6 +115,21 @@ def main() -> None:
         driver.find_element(By.ID, "safe-response").send_keys("Ответ без таблицы")
         click(By.ID, "safe-build")
         assert "Не найдена таблица" in driver.find_element(By.ID, "safe-status").text
+        legacy_answer = """| Уровень | Категория сведений | Значимость | Допустимый контур | Передача | Хранение | Решение | Нормативное основание |
+|---|---|---|---|---|---|---|---|
+| Государственная тайна | Сведения, отнесённые к гостайне | Высшая | Специализированный защищённый контур | Запрещена без санкции | По режиму гостайны | Уполномоченное подразделение | Закон РФ № 5485-1 |
+
+**НЕ ДЕЛАТЬ**
+- Вводить в сервис фрагменты закрытых сведений
+
+**СДЕЛАТЬ**
+- Обратиться в режимно-секретный орган
+
+**ВОПРОСЫ СПЕЦИАЛИСТУ**
+- Какой уровень защиты требуется?"""
+        driver.execute_script("arguments[0].value = arguments[1]", driver.find_element(By.ID, "safe-response"), legacy_answer)
+        click(By.ID, "safe-build")
+        assert "Предварительное заключение извлечено" in driver.find_element(By.ID, "safe-status").text
         expected_tones = {"public": "green", "personal": "amber", "special": "red", "restricted": "red", "prohibited": "red"}
         for scenario, tone in expected_tones.items():
             click(By.CSS_SELECTOR, f'[data-security="{scenario}"]')

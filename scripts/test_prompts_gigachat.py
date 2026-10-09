@@ -84,7 +84,7 @@ SECURITY_TASK = """Вы — помощник по предварительной
 
 Уровень: персональные данные. Тип сведений: ФИО, контактные сведения и содержание обращения, позволяющее определить заявителя. Обработка: подготовка проекта ответа. Хранение: только в утверждённой информационной системе. Использование: сотрудник проверяет и утверждает результат. Пограничный случай: поставщик известен, но договор, размещение, хранение и удаление не подтверждены.
 
-Верните только Markdown: таблицу с колонками «Уровень | Категория сведений | Значимость | Допустимый контур | Передача | Хранение | Решение | Нормативное основание», затем маркированные разделы «НЕ ДЕЛАТЬ», «СДЕЛАТЬ», «ВОПРОСЫ СПЕЦИАЛИСТУ». Не придумывайте согласования и свойства сервиса."""
+Верните только Markdown и ровно две таблицы. Таблица 1 — с точными колонками «Уровень | Категория сведений | Значимость | Допустимый контур | Передача | Хранение | Решение | Нормативное основание». Таблица 2 — с точными колонками «Раздел | Пункт»; в колонке «Раздел» используйте только значения «НЕ ДЕЛАТЬ», «СДЕЛАТЬ» и «ВОПРОСЫ СПЕЦИАЛИСТУ», по одному пункту в строке. Не придумывайте согласования и свойства сервиса."""
 
 
 def validate_security_markdown(text: str) -> None:
@@ -92,10 +92,13 @@ def validate_security_markdown(text: str) -> None:
     table_lines = [line for line in text.splitlines() if line.strip().startswith("|")]
     if len(table_lines) < 3 or not all(header.lower() in table_lines[0].lower() for header in required_headers):
         raise ValueError("нет полной Markdown-таблицы")
+    action_header = next((i for i, line in enumerate(table_lines) if re.match(r"^\s*\|\s*Раздел\s*\|\s*Пункт\s*\|?\s*$", line, re.I)), None)
+    if action_header is None:
+        raise ValueError("нет таблицы действий с колонками Раздел и Пункт")
+    action_rows = "\n".join(table_lines[action_header + 2:])
     for section in ("НЕ ДЕЛАТЬ", "СДЕЛАТЬ", "ВОПРОСЫ СПЕЦИАЛИСТУ"):
-        match = re.search(rf"^#+\s*{section}\s*$([\s\S]*?)(?=^#+|\Z)", text, re.I | re.M)
-        if not match or not re.search(r"^\s*[-*]\s+", match.group(1), re.M):
-            raise ValueError(f"нет маркированного раздела {section}")
+        if not re.search(rf"^\s*\|\s*{section}\s*\|\s*\S", action_rows, re.I | re.M):
+            raise ValueError(f"нет строки раздела {section}")
 
 def main() -> int:
     key = os.getenv("GIGACHAT_AUTH_KEY", "").strip()
@@ -153,7 +156,7 @@ def main() -> int:
                 except ValueError as exc:
                     if attempt == 2:
                         raise
-                    security_text = ask(f"Ответ не прошёл машинную проверку: {exc}. Нужна полная Markdown-таблица со всеми восемью колонками и ровно три заголовка вида ### НЕ ДЕЛАТЬ, ### СДЕЛАТЬ, ### ВОПРОСЫ СПЕЦИАЛИСТУ; под каждым нужен маркированный список. Верните только исправленный Markdown.\n\n" + security_text).strip()
+                    security_text = ask(f"Ответ не прошёл машинную проверку: {exc}. Нужны ровно две Markdown-таблицы: первая со всеми восемью колонками оценки; вторая с точными колонками Раздел и Пункт и строками для НЕ ДЕЛАТЬ, СДЕЛАТЬ, ВОПРОСЫ СПЕЦИАЛИСТУ. Верните только исправленный Markdown.\n\n" + security_text).strip()
             print("безопасность: Markdown принят")
         except (ValueError, KeyError, requests.RequestException) as exc:
             failed.append("безопасность")
