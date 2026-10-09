@@ -11,6 +11,9 @@ import os
 import sys
 import uuid
 import requests
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 OAUTH = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
 CHAT = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
