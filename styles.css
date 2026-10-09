@@ -54,8 +54,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .journey { display: grid; grid-template-columns: repeat(9, 1fr); gap: var(--space-2); position: sticky; top: 0; z-index: 20; padding: var(--space-3) 0; background: linear-gradient(var(--color-paper) 82%, transparent); }
 .journey button { min-height: 64px; padding: var(--space-2); border: 1px solid var(--color-line); border-radius: var(--radius-sm); background: var(--color-surface); color: var(--color-muted); font: 12px/1.2 inherit; cursor: pointer; text-align: left; }
 .journey button span { display: block; margin-bottom: var(--space-1); color: var(--color-blue); font-weight: 800; }
+.journey button small { display: block; margin-bottom: 2px; color: #778596; font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 .journey button.active { border-color: var(--color-navy); background: var(--color-navy); color: #fff; }
 .journey button.active span { color: #9ed7ff; }
+.journey button.active small { color: #b8cce0; }
 .journey button.done { border-color: #8fc9b5; }
 
 .stage { min-height: 720px; overflow: hidden; border: 1px solid var(--color-line); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-card); }
@@ -211,6 +213,23 @@ p { margin-top: 0; }
 .matrix-row > * { padding: var(--space-2); border: 1px solid var(--color-line); background: #fff; }
 .matrix-head > * { background: #eaf0f5; font-weight: 700; }
 .deck { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+.pilot-passport { overflow: hidden; margin-top: var(--space-4); border: 1px solid #a9c8be; border-radius: var(--radius-md); background: #fff; }
+.pilot-passport header { display: grid; gap: var(--space-1); padding: var(--space-4); background: var(--color-green-soft); }
+.pilot-passport header small { color: var(--color-green); font-weight: 800; letter-spacing: .08em; }
+.pilot-passport header b { font-size: 19px; }
+.pilot-passport dl { display: grid; grid-template-columns: 1fr 1fr; margin: 0; }
+.pilot-passport dl div { padding: var(--space-3) var(--space-4); border-top: 1px solid var(--color-line); }
+.pilot-passport dt { color: var(--color-muted); font-size: 11px; font-weight: 800; text-transform: uppercase; }
+.pilot-passport dd { margin: var(--space-1) 0 0; font-size: 13px; }
+.pilot-passport section { padding: var(--space-3) var(--space-4); border-top: 1px solid var(--color-line); background: #fff8e8; }
+.pilot-passport section h4 { margin: 0 0 var(--space-2); }
+.pilot-passport section p { margin: var(--space-1) 0; font-size: 13px; }
+.pilot-passport section p::before { content: '■'; margin-right: var(--space-2); color: var(--color-orange); font-size: 9px; }
+.contractor-check { display: grid; gap: var(--space-2); margin: var(--space-4) 0; padding: var(--space-4); border-radius: var(--radius-sm); background: var(--color-blue-soft); }
+.contractor-check h4 { margin: 0; }
+.contractor-check p { display: flex; gap: var(--space-3); margin: 0; font-size: 13px; }
+.contractor-check p b { color: var(--color-blue); }
+.deck-heading { margin: var(--space-5) 0 var(--space-3); }
 .slide-card { aspect-ratio: 16/7; padding: var(--space-4); border-radius: var(--radius-sm); background: linear-gradient(125deg, #102d4b, #236b9b); color: #fff; }
 .slide-card small { opacity: .7; }
 .slide-card b { display: block; margin: var(--space-2) 0; font-size: 19px; }
@@ -220,6 +239,12 @@ p { margin-top: 0; }
 .stage-controls span { display: block; color: var(--color-muted); font-size: 12px; }
 .stage-controls strong { font-size: 14px; }
 .stage-controls button:disabled { opacity: .35; cursor: not-allowed; }
+.site-footer { background: #102a45; color: #dfeaf4; }
+.site-footer > div { display: grid; max-width: var(--content-width); grid-template-columns: 1.1fr 1fr .9fr; gap: var(--space-7); margin: auto; padding: var(--space-8) var(--space-6); }
+.site-footer section { display: grid; align-content: start; gap: var(--space-2); }
+.site-footer h2 { margin: 0 0 var(--space-2); color: #fff; font-size: 16px; }
+.site-footer a { color: #b9dcf5; font-size: 13px; }
+.site-footer p { margin: 0; color: #aebfce; font-size: 13px; }
 
 @media (max-width: 900px) {
   .hero-inner { padding: var(--space-8) var(--space-5); }
@@ -233,6 +258,7 @@ p { margin-top: 0; }
   .stage-body, .stage-head { padding: var(--space-5); }
   .forecast-frame { height: 760px; }
   .prompt-toolbar, .prompt-footer { align-items: flex-start; flex-direction: column; }
+  .site-footer > div { grid-template-columns: 1fr; padding: var(--space-7) var(--space-5); }
   .prompt-toolbar-actions, .prompt-footer-actions { width: 100%; justify-content: space-between; }
 }
 
@@ -241,7 +267,7 @@ p { margin-top: 0; }
   .hero h1 { font-size: 38px; }
   .lead { font-size: 17px; }
   .stage-head h2 { font-size: 27px; }
-  .artifact-grid, .metric-row, .deck, .security-card dl, .decision-lists { grid-template-columns: 1fr; }
+  .artifact-grid, .metric-row, .deck, .security-card dl, .decision-lists, .pilot-passport dl { grid-template-columns: 1fr; }
   .stage-controls { grid-template-columns: 1fr 1fr; }
   .stage-controls > div { display: none; }
   .button { font-size: 13px; }

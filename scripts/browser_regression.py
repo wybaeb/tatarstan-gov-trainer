@@ -80,7 +80,7 @@ def main() -> None:
         assert "День эксперимента" in driver.find_element(By.CSS_SELECTOR, ".chart").text
         assert "Как читать доверительный интервал" in driver.find_element(By.CSS_SELECTOR, ".method").get_attribute("textContent")
 
-        open_step(6, "Расчёт начинается")
+        open_step(8, "Расчёт начинается")
         for mode in ("formula", "excel", "sheets"):
             click(By.CSS_SELECTOR, f'[data-auto="{mode}"]')
             click(By.ID, "auto-reference")
@@ -90,7 +90,7 @@ def main() -> None:
         click(By.CSS_SELECTOR, '[data-auto="excel"]')
         assert driver.find_element(By.CSS_SELECTOR, 'a[download]').get_attribute("href").endswith(".xlsm")
 
-        open_step(7, "утверждает маршрут")
+        open_step(6, "утверждает маршрут")
         driver.execute_script(
             "arguments[0].value = arguments[1]",
             driver.find_element(By.ID, "class-response"),
@@ -98,13 +98,20 @@ def main() -> None:
         )
         click(By.ID, "class-build")
         assert "items[0].reason" in driver.find_element(By.ID, "class-status").text
+        driver.execute_script(
+            "arguments[0].value = arguments[1]",
+            driver.find_element(By.ID, "class-response"),
+            '{"items":[{"id":"EDU-001","category":"иное","confidence":0.5,"reason":"недостаточно данных",},{"id":"EDU-002","category":"благоустройство","confidence":0.9,"reason":"состояние объекта",},{"id":"EDU-003","category":"транспортная доступность","confidence":0.8,"reason":"маршрут",}],"escalation":[{"condition":"x","route":"y",}],}',
+        )
+        click(By.ID, "class-build")
+        assert "Матрица построена" in driver.find_element(By.ID, "class-status").text
         click(By.ID, "class-example")
         driver.execute_script("arguments[0].value += '\\nПояснение после JSON {}'", driver.find_element(By.ID, "class-response"))
         click(By.ID, "class-build")
         assert "Матрица построена" in driver.find_element(By.ID, "class-status").text
         assert "проверка сотрудником" in driver.find_element(By.ID, "class-artifact").text
 
-        open_step(8, "Допустимый контур")
+        open_step(7, "Допустимый контур")
         driver.find_element(By.ID, "safe-response").send_keys("Ответ без таблицы")
         click(By.ID, "safe-build")
         assert "Не найдена таблица" in driver.find_element(By.ID, "safe-status").text
@@ -123,8 +130,13 @@ def main() -> None:
         open_step(9, "презентацию защиты")
         click(By.ID, "pilot-example")
         click(By.ID, "pilot-build")
-        assert "Презентация сформирована" in driver.find_element(By.ID, "pilot-status").text
+        assert "Паспорт, чек-лист и презентация сформированы" in driver.find_element(By.ID, "pilot-status").text
+        assert "Вопросы к подрядчику" in driver.find_element(By.ID, "pilot-artifact").text
+        assert "Стоп-условия" in driver.find_element(By.ID, "pilot-artifact").text
         assert len(driver.find_elements(By.CSS_SELECTOR, ".slide-card")) == 6
+
+        assert len(driver.find_elements(By.CSS_SELECTOR, ".journey small")) == 9
+        assert len(driver.find_elements(By.CSS_SELECTOR, ".site-footer a")) >= 8
 
         severe = [entry for entry in driver.get_log("browser") if entry["level"] == "SEVERE"]
         assert not severe, severe
