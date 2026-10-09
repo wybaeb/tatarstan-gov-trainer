@@ -179,6 +179,24 @@ def main() -> None:
         assert "Вопросы к подрядчику" in driver.find_element(By.ID, "pilot-artifact").text
         assert "Стоп-условия" in driver.find_element(By.ID, "pilot-artifact").text
         assert len(driver.find_elements(By.CSS_SELECTOR, ".slide-card")) == 6
+        pilot_sections = driver.find_elements(By.CSS_SELECTOR, ".pilot-flow > section")
+        assert len(pilot_sections) == 2
+        assert abs(pilot_sections[0].rect["x"] - pilot_sections[1].rect["x"]) < 2
+        assert abs(pilot_sections[0].rect["width"] - pilot_sections[1].rect["width"]) < 2
+        assert len(driver.find_elements(By.CSS_SELECTOR, ".pilot-fields > .field")) == 5
+        assert driver.execute_script("return document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+
+        driver.set_window_size(820, 1100)
+        driver.get(f"{BASE}/?step=9")
+        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, ".pilot-fields"))
+        click(By.ID, "pilot-example")
+        click(By.ID, "pilot-build")
+        wait.until(lambda d: len(d.find_elements(By.CSS_SELECTOR, ".slide-card")) == 6)
+        assert driver.execute_script("return document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+        field_widths = [item.rect["width"] for item in driver.find_elements(By.CSS_SELECTOR, ".pilot-fields > .field")]
+        assert max(field_widths) - min(field_widths) < 2
+        panel_right = driver.find_element(By.CSS_SELECTOR, ".pilot-output").rect["x"] + driver.find_element(By.CSS_SELECTOR, ".pilot-output").rect["width"]
+        assert all(card.rect["x"] + card.rect["width"] <= panel_right for card in driver.find_elements(By.CSS_SELECTOR, ".slide-card"))
 
         assert len(driver.find_elements(By.CSS_SELECTOR, ".journey small")) == 9
         assert len(driver.find_elements(By.CSS_SELECTOR, ".site-footer a")) >= 8
