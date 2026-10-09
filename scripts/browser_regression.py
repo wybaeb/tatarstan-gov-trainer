@@ -2,8 +2,14 @@
 """Сквозная браузерная проверка девяти шагов практикума."""
 from __future__ import annotations
 
+import base64
+import io
+import json
 import os
+import tempfile
+from pathlib import Path
 
+from pypdf import PdfReader
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -175,10 +181,19 @@ def main() -> None:
         open_step(9, "презентацию защиты")
         click(By.ID, "pilot-example")
         click(By.ID, "pilot-build")
-        assert "Паспорт, чек-лист и презентация сформированы" in driver.find_element(By.ID, "pilot-status").text
+        assert "интерактивная HTML-презентация сформированы" in driver.find_element(By.ID, "pilot-status").text
         assert "Вопросы к подрядчику" in driver.find_element(By.ID, "pilot-artifact").text
         assert "Стоп-условия" in driver.find_element(By.ID, "pilot-artifact").text
         assert len(driver.find_elements(By.CSS_SELECTOR, ".slide-card")) == 6
+        assert len(driver.find_elements(By.CSS_SELECTOR, ".slide-card.active")) == 1
+        assert driver.find_element(By.ID, "pilot-slide-counter").text == "1 / 6"
+        click(By.ID, "pilot-slide-next")
+        assert driver.find_element(By.ID, "pilot-slide-counter").text == "2 / 6"
+        driver.find_element(By.ID, "pilot-slider").send_keys("\ue014")
+        assert driver.find_element(By.ID, "pilot-slide-counter").text == "3 / 6"
+        download = driver.find_element(By.ID, "pilot-download")
+        assert download.get_attribute("href").startswith("blob:")
+        assert download.get_attribute("download") == "pasport_pilota_presentation.html"
         pilot_sections = driver.find_elements(By.CSS_SELECTOR, ".pilot-flow > section")
         assert len(pilot_sections) == 2
         assert abs(pilot_sections[0].rect["x"] - pilot_sections[1].rect["x"]) < 2
@@ -200,6 +215,34 @@ def main() -> None:
 
         assert len(driver.find_elements(By.CSS_SELECTOR, ".journey small")) == 9
         assert len(driver.find_elements(By.CSS_SELECTOR, ".site-footer a")) >= 8
+
+        pilot_data = json.loads(driver.find_element(By.ID, "pilot-response").get_attribute("value"))
+        presentation_html = driver.execute_script("return buildPilotPresentationHtml(arguments[0])", pilot_data["slides"])
+        assert "@page{size:A4 landscape" in presentation_html
+        assert "@media print" in presentation_html
+        assert "break-after:page" in presentation_html
+        assert presentation_html.count('<section class="slide') == 6
+        with tempfile.TemporaryDirectory() as temp_dir:
+            presentation_path = Path(temp_dir) / "presentation.html"
+            presentation_path.write_text(presentation_html, encoding="utf-8")
+            driver.set_window_size(1280, 900)
+            driver.get(presentation_path.as_uri())
+            wait.until(lambda d: len(d.find_elements(By.CSS_SELECTOR, ".slide")) == 6)
+            assert len(driver.find_elements(By.CSS_SELECTOR, ".slide.active")) == 1
+            click(By.ID, "next")
+            assert driver.find_element(By.ID, "counter").text == "2 / 6"
+            driver.find_element(By.ID, "deck").send_keys("\ue014")
+            assert driver.find_element(By.ID, "counter").text == "3 / 6"
+            driver.execute_cdp_cmd("Emulation.setEmulatedMedia", {"media": "print"})
+            assert all(driver.execute_script("return getComputedStyle(arguments[0]).display", slide) == "flex" for slide in driver.find_elements(By.CSS_SELECTOR, ".slide"))
+            assert driver.execute_script("return getComputedStyle(arguments[0]).backgroundColor", driver.find_element(By.CSS_SELECTOR, ".slide")) == "rgb(255, 255, 255)"
+            assert driver.execute_script("return getComputedStyle(arguments[0]).color", driver.find_element(By.CSS_SELECTOR, ".slide")) == "rgb(0, 0, 0)"
+            assert driver.execute_script("return getComputedStyle(arguments[0]).breakAfter", driver.find_element(By.CSS_SELECTOR, ".slide")) == "page"
+            pdf_result = driver.execute_cdp_cmd("Page.printToPDF", {"preferCSSPageSize": True, "printBackground": True})
+            pdf = PdfReader(io.BytesIO(base64.b64decode(pdf_result["data"])))
+            assert len(pdf.pages) == 6
+            assert all(float(page.mediabox.width) > float(page.mediabox.height) for page in pdf.pages)
+            driver.execute_cdp_cmd("Emulation.setEmulatedMedia", {"media": "screen"})
 
         severe = [entry for entry in driver.get_log("browser") if entry["level"] == "SEVERE"]
         assert not severe, severe

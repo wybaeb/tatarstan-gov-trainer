@@ -227,7 +227,18 @@ p { margin-top: 0; }
 .matrix-row { display: grid; grid-template-columns: 1fr 1.2fr .6fr; gap: var(--space-1); }
 .matrix-row > * { padding: var(--space-2); border: 1px solid var(--color-line); background: #fff; }
 .matrix-head > * { background: #eaf0f5; font-weight: 700; }
-.deck { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+.deck-slider { display: grid; min-width: 0; gap: var(--space-3); margin-top: var(--space-5); }
+.deck-slider-header { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); }
+.deck-slider-header h3 { margin: 0 0 var(--space-1); }
+.deck-slider-header p { max-width: 720px; margin: 0; color: var(--color-muted); font-size: 13px; }
+.deck-viewport { min-width: 0; }
+.deck-controls { display: flex; align-items: center; justify-content: center; gap: var(--space-3); }
+.deck-controls > button { min-height: 40px; border: 1px solid var(--color-line); border-radius: var(--radius-sm); padding: 8px var(--space-3); background: #fff; color: var(--color-navy); font-weight: 750; cursor: pointer; }
+.deck-controls > button:disabled { opacity: .35; cursor: default; }
+.deck-controls > span { min-width: 54px; color: var(--color-muted); text-align: center; font-size: 13px; font-weight: 750; }
+.deck-dots { display: flex; gap: 6px; }
+.deck-dots button { width: 10px; height: 10px; border: 0; border-radius: 50%; padding: 0; background: #b8c6d2; cursor: pointer; }
+.deck-dots button.active { background: var(--color-navy); }
 .pilot-flow { grid-template-columns: minmax(0, 1fr); }
 .pilot-input, .pilot-output { min-width: 0; }
 .pilot-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
@@ -250,9 +261,14 @@ p { margin-top: 0; }
 .contractor-check p { display: flex; gap: var(--space-3); margin: 0; font-size: 13px; }
 .contractor-check p b { color: var(--color-blue); }
 .deck-heading { margin: var(--space-5) 0 var(--space-3); }
-.slide-card { min-width: 0; aspect-ratio: 16/7; overflow-wrap: anywhere; padding: var(--space-4); border-radius: var(--radius-sm); background: linear-gradient(125deg, #102d4b, #236b9b); color: #fff; }
-.slide-card small { opacity: .7; }
-.slide-card b { display: block; margin: var(--space-2) 0; font-size: 19px; }
+.slide-card { display: none; position: relative; min-width: 0; aspect-ratio: 16/9; overflow: hidden; overflow-wrap: anywhere; padding: clamp(28px, 6vw, 72px); border-radius: var(--radius-md); background: linear-gradient(125deg, #102d4b, #236b9b); color: #fff; }
+.slide-card.active { display: flex; flex-direction: column; justify-content: space-between; }
+.slide-card-number { position: absolute; top: 6%; right: 5%; font-size: 12px; font-weight: 750; letter-spacing: .08em; opacity: .72; }
+.slide-card-content { margin: auto 0; }
+.slide-card small { display: block; margin-bottom: var(--space-4); color: #addbfa; font-weight: 800; letter-spacing: .1em; opacity: .9; }
+.slide-card b { display: block; max-width: 850px; margin-bottom: var(--space-4); font-size: clamp(30px, 4.6vw, 58px); line-height: 1.04; }
+.slide-card p { max-width: 850px; margin: 0; font-size: clamp(17px, 2.1vw, 27px); line-height: 1.35; }
+.slide-card footer { font-size: 11px; opacity: .7; }
 
 .stage-controls { display: grid; grid-template-columns: 190px 1fr 190px; align-items: center; gap: var(--space-5); margin-top: var(--space-4); }
 .stage-controls > div { text-align: center; }
@@ -274,6 +290,7 @@ p { margin-top: 0; }
   .two, .profile-grid { grid-template-columns: 1fr; }
   .pilot-fields { grid-template-columns: 1fr; }
   .pilot-fields .field:last-child { grid-column: auto; }
+  .deck-slider-header { align-items: stretch; flex-direction: column; }
   .scenario-tabs { grid-template-columns: repeat(2, 1fr); }
   .safety-note { flex-direction: column; }
   .safety-note b { min-width: 0; }
@@ -289,7 +306,7 @@ p { margin-top: 0; }
   .hero h1 { font-size: 38px; }
   .lead { font-size: 17px; }
   .stage-head h2 { font-size: 27px; }
-  .artifact-grid, .metric-row, .deck, .security-card dl, .decision-lists, .pilot-passport dl, .route-legend { grid-template-columns: 1fr; }
+  .artifact-grid, .metric-row, .security-card dl, .decision-lists, .pilot-passport dl, .route-legend { grid-template-columns: 1fr; }
   .route-legend div { border-right: 0; border-bottom: 1px solid var(--color-line); }
   .route-legend div:last-child { border-bottom: 0; }
   .stage-controls { grid-template-columns: 1fr 1fr; }
@@ -302,4 +319,8 @@ p { margin-top: 0; }
   .segmented button { flex: 1; }
   .prompt-toolbar .icon-button { position: absolute; top: var(--space-3); right: var(--space-3); }
   .prompt-toolbar { position: relative; padding-right: 58px; }
+  .deck-controls { flex-wrap: wrap; }
+  .deck-dots { order: 3; width: 100%; justify-content: center; }
+  .slide-card { padding: 24px; }
+  .slide-card small, .slide-card footer { font-size: 9px; }
 }
