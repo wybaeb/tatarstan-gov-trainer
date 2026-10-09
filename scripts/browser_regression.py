@@ -31,6 +31,8 @@ def main() -> None:
 
     try:
         open_step(1, "Показатель")
+        assert "массив" not in driver.find_element(By.TAG_NAME, "body").text.lower()
+        assert "учебная форма" in driver.find_element(By.CSS_SELECTOR, ".method").get_attribute("textContent")
         assert not driver.find_elements(By.XPATH, "//button[contains(normalize-space(.), 'Сформировать')]")
         composer = driver.find_element(By.ID, "metric-prompt-composer")
         assert composer.find_element(By.CSS_SELECTOR, ".prompt-open").get_attribute("href") == "https://gosprompt.ru/"
@@ -50,12 +52,16 @@ def main() -> None:
         click(By.CSS_SELECTOR, '[data-period="day"]')
         assert "рабочий день" in driver.find_element(By.ID, "period-thesis").text
         assert driver.find_elements(By.CSS_SELECTOR, "#period-chart polyline")
+        assert "Месяц" in driver.find_element(By.CSS_SELECTOR, "#period-chart svg").text
+        assert "Как выполняется пересчёт" in driver.find_element(By.CSS_SELECTOR, ".method").get_attribute("textContent")
 
         open_step(3, "Повторяющиеся циклы")
         for stage in range(5):
             click(By.CSS_SELECTOR, f'[data-season="{stage}"]')
             assert driver.find_elements(By.CSS_SELECTOR, ".chart polyline")
         assert "снизился на 16%" in driver.find_element(By.CSS_SELECTOR, ".thesis").text
+        assert "Дата наблюдения" in driver.find_element(By.CSS_SELECTOR, ".chart").text
+        assert "Как разделены" in driver.find_element(By.CSS_SELECTOR, ".method").get_attribute("textContent")
 
         open_step(4, "Прогноз проверяется")
         frame = driver.find_element(By.CSS_SELECTOR, "iframe.forecast-frame")
@@ -68,6 +74,8 @@ def main() -> None:
         assert driver.find_element(By.CSS_SELECTOR, ".ci-point").get_attribute("style") != first
         assert "1.8 п.п." in driver.find_element(By.CSS_SELECTOR, ".metric-row").text
         assert "-1.4…+5.1" in driver.find_element(By.CSS_SELECTOR, ".panel").text
+        assert "День эксперимента" in driver.find_element(By.CSS_SELECTOR, ".chart").text
+        assert "Как читать доверительный интервал" in driver.find_element(By.CSS_SELECTOR, ".method").get_attribute("textContent")
 
         open_step(6, "Большой набор")
         for mode in ("excel", "sheets"):
