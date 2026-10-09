@@ -7,13 +7,16 @@ import json
 import math
 from datetime import date, timedelta
 from pathlib import Path
+from zipfile import ZipFile
 
 import xlsxwriter
-from openpyxl import load_workbook
+
+from build_training_datasets import HEADERS, make_rows
 
 ROOT = Path(__file__).resolve().parents[1]
 DOWNLOADS = ROOT / "downloads"
 DATA = ROOT / "data"
+VBA_PROJECT = Path("/tmp/tatarstan_gov_vbaProject.bin")
 
 
 def build_seasonality() -> None:
@@ -56,16 +59,22 @@ def build_seasonality() -> None:
 
 
 def load_raw_rows() -> tuple[list[str], list[list[object]]]:
-    source = DOWNLOADS / "obrashcheniya_12000_excel.xlsx"
-    workbook = load_workbook(source, read_only=True, data_only=True)
-    sheet = workbook["Выгрузка"]
-    values = list(sheet.iter_rows(values_only=True))
-    return list(values[0]), [list(row) for row in values[1:]]
+    return HEADERS, make_rows()
+
+
+def extract_vba_project() -> Path:
+    if VBA_PROJECT.exists():
+        return VBA_PROJECT
+    source = DOWNLOADS / "obrashcheniya_12000_excel.xlsm"
+    with ZipFile(source) as archive:
+        VBA_PROJECT.write_bytes(archive.read("xl/vbaProject.bin"))
+    return VBA_PROJECT
 
 
 def build_formula_workbook(headers: list[str], rows: list[list[object]]) -> None:
-    target = DOWNLOADS / "uchebny_nabor_formuly_excel.xlsx"
+    target = DOWNLOADS / "uchebny_nabor_formuly_excel.xlsm"
     workbook = xlsxwriter.Workbook(target)
+    workbook.add_vba_project(str(extract_vba_project()))
     sheet = workbook.add_worksheet("Формулы")
     guide = workbook.add_worksheet("Задание")
     title = workbook.add_format({"bold": True, "font_size": 16, "font_color": "#173A61"})
@@ -76,7 +85,9 @@ def build_formula_workbook(headers: list[str], rows: list[list[object]]) -> None
     guide.write("A3", "1. Рассчитайте длительность обработки: дата завершения − дата регистрации.")
     guide.write("A4", "2. Сравните длительность с целевым сроком и верните «Да» или «Нет».")
     guide.write("A5", "3. Посчитайте долю записей, завершённых в срок.")
-    guide.write("A7", "Используйте только обезличенный обучающий набор. Лист «Формулы» содержит 120 строк с уже распознанными датами.")
+    guide.write("A7", "Региональные настройки по умолчанию: точка с запятой между аргументами, запятая в дробной части.")
+    guide.write("A8", "Книга уже сохранена в формате XLSM: при переходе к макросам менять формат не потребуется.")
+    guide.write("A10", "Используйте только обезличенный обучающий набор. Лист «Формулы» содержит 120 строк с уже распознанными датами.")
     guide.set_column("A:A", 115)
     subset_headers = [headers[i] for i in (0, 1, 2, 3, 4, 5, 6)] + ["Длительность, дней", "Срок соблюдён"]
     for col, value in enumerate(subset_headers):
@@ -98,11 +109,8 @@ def build_formula_workbook(headers: list[str], rows: list[list[object]]) -> None
 
 def build_macro_workbook(headers: list[str], rows: list[list[object]]) -> None:
     target = DOWNLOADS / "obrashcheniya_12000_excel.xlsm"
-    project = Path("/tmp/vbaProject.bin")
-    if not project.exists():
-        raise SystemExit("Expected /tmp/vbaProject.bin from the XlsxWriter example project")
     workbook = xlsxwriter.Workbook(target)
-    workbook.add_vba_project(str(project))
+    workbook.add_vba_project(str(extract_vba_project()))
     sheet = workbook.add_worksheet("Выгрузка")
     guide = workbook.add_worksheet("Инструкция")
     head = workbook.add_format({"bold": True, "bg_color": "#173A61", "font_color": "#FFFFFF", "border": 1})

@@ -8,13 +8,10 @@ import random
 from datetime import date, timedelta
 from pathlib import Path
 
-from openpyxl import Workbook
-from openpyxl.styles import Alignment, Font, PatternFill
-from openpyxl.worksheet.table import Table, TableStyleInfo
-
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "downloads"
 RNG = random.Random(13026)
+HEADERS = ["ID обращения", "Дата регистрации", "Дата завершения", "Канал", "Категория", "Статус", "Целевой срок, дней", "Территориальная группа", "Краткое содержание"]
 
 CHANNELS = {
     "Портал": ["Портал", " портал ", "ПОРТАЛ", "электронный портал"],
@@ -69,7 +66,7 @@ def make_rows() -> list[list[object]]:
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    headers = ["ID обращения", "Дата регистрации", "Дата завершения", "Канал", "Категория", "Статус", "Целевой срок, дней", "Территориальная группа", "Краткое содержание"]
+    headers = HEADERS
     rows = make_rows()
 
     csv_path = OUT / "obrashcheniya_12000_google.csv"
@@ -77,39 +74,6 @@ def main() -> None:
         writer = csv.writer(fh, delimiter=";")
         writer.writerow(headers)
         writer.writerows(rows)
-
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Выгрузка"
-    ws.append(headers)
-    for row in rows:
-        ws.append(row)
-    ws.freeze_panes = "A2"
-    ws.auto_filter.ref = ws.dimensions
-    widths = [17, 19, 19, 23, 27, 23, 21, 26, 54]
-    for idx, width in enumerate(widths, 1):
-        ws.column_dimensions[chr(64 + idx)].width = width
-    for cell in ws[1]:
-        cell.font = Font(bold=True, color="FFFFFF")
-        cell.fill = PatternFill("solid", fgColor="173A63")
-        cell.alignment = Alignment(wrap_text=True)
-    table = Table(displayName="TrainingAppeals", ref=ws.dimensions)
-    table.tableStyleInfo = TableStyleInfo(name="TableStyleMedium2", showRowStripes=True)
-    ws.add_table(table)
-
-    info = wb.create_sheet("Описание")
-    notes = [
-        ("Назначение", "Обезличенная учебная выгрузка для отработки автоматизации в Excel."),
-        ("Объём", f"{len(rows)} строк с преднамеренными полными повторами."),
-        ("Особенности", "Даты записаны в двух форматах; каналы имеют варианты написания; незавершённые обращения содержат пустую дату или «н/д»."),
-        ("Ограничение", "Данные не описывают фактическую работу организаций, территорий или должностных лиц."),
-    ]
-    for row in notes:
-        info.append(row)
-    info.column_dimensions["A"].width = 20
-    info.column_dimensions["B"].width = 105
-    info["A1"].font = Font(bold=True)
-    wb.save(OUT / "obrashcheniya_12000_excel.xlsx")
 
     with (OUT / "seasonality_training.csv").open("w", encoding="utf-8-sig", newline="") as fh:
         writer = csv.writer(fh, delimiter=";")

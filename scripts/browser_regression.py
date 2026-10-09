@@ -81,6 +81,27 @@ def main() -> None:
         assert "Как читать доверительный интервал" in driver.find_element(By.CSS_SELECTOR, ".method").get_attribute("textContent")
 
         open_step(8, "Расчёт начинается")
+        assert driver.find_element(By.CSS_SELECTOR, '[data-excel-locale="ru"]').get_attribute("class") == "active"
+        formula_download = driver.find_element(By.CSS_SELECTOR, 'a[download]').get_attribute("href")
+        assert formula_download.endswith("uchebny_nabor_formuly_excel.xlsm")
+        prompt = driver.find_element(By.CSS_SELECTOR, "#auto-prompt-composer .prompt-preview").get_attribute("textContent")
+        assert "разделитель аргументов — «;»" in prompt
+        assert "десятичный знак — «,»" in prompt
+        click(By.ID, "auto-reference")
+        wait.until(lambda d: "Все обязательные признаки" in d.find_element(By.ID, "auto-status").text)
+        assert ";" in driver.find_element(By.ID, "auto-code").get_attribute("value")
+        assert not driver.find_elements(By.CSS_SELECTOR, ".check.fail")
+
+        click(By.CSS_SELECTOR, '[data-excel-locale="international"]')
+        prompt = driver.find_element(By.CSS_SELECTOR, "#auto-prompt-composer .prompt-preview").get_attribute("textContent")
+        assert "разделитель аргументов — «,»" in prompt
+        assert "десятичный знак — «.»" in prompt
+        click(By.ID, "auto-reference")
+        wait.until(lambda d: "Все обязательные признаки" in d.find_element(By.ID, "auto-status").text)
+        assert "," in driver.find_element(By.ID, "auto-code").get_attribute("value")
+        assert not driver.find_elements(By.CSS_SELECTOR, ".check.fail")
+
+        click(By.CSS_SELECTOR, '[data-excel-locale="ru"]')
         for mode in ("formula", "excel", "sheets"):
             click(By.CSS_SELECTOR, f'[data-auto="{mode}"]')
             click(By.ID, "auto-reference")
@@ -89,6 +110,7 @@ def main() -> None:
         assert len(driver.find_elements(By.CSS_SELECTOR, 'a[download]')) == 2
         click(By.CSS_SELECTOR, '[data-auto="excel"]')
         assert driver.find_element(By.CSS_SELECTOR, 'a[download]').get_attribute("href").endswith(".xlsm")
+        assert not driver.find_elements(By.CSS_SELECTOR, 'a[href$=".xlsx"]')
 
         open_step(6, "утверждает маршрут")
         driver.execute_script(

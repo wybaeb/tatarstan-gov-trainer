@@ -23,9 +23,14 @@ focus = seasonality["rows"][-seasonality["focus_days"] :]
 signs = [slope([row[key] for row in focus]) > 0 for key in ("observed", "without_annual", "without_monthly", "baseline")]
 assert signs == [True, False, True, False], signs
 
-formula_book = load_workbook(ROOT / "downloads/uchebny_nabor_formuly_excel.xlsx", read_only=True)
+formula_path = ROOT / "downloads/uchebny_nabor_formuly_excel.xlsm"
+formula_book = load_workbook(formula_path, read_only=True, keep_vba=True)
 assert formula_book.sheetnames == ["Формулы", "Задание"]
 assert formula_book["Формулы"].max_row == 121
+with ZipFile(formula_path) as archive:
+    assert "xl/vbaProject.bin" in archive.namelist()
+    content_types = archive.read("[Content_Types].xml")
+    assert b"application/vnd.ms-excel.sheet.macroEnabled.main+xml" in content_types
 
 macro_path = ROOT / "downloads/obrashcheniya_12000_excel.xlsm"
 macro_book = load_workbook(macro_path, read_only=True, keep_vba=True)
@@ -35,5 +40,7 @@ with ZipFile(macro_path) as archive:
     assert "xl/vbaProject.bin" in archive.namelist()
     content_types = archive.read("[Content_Types].xml")
     assert b"application/vnd.ms-excel.sheet.macroEnabled.main+xml" in content_types
+
+assert not list((ROOT / "downloads").glob("*.xlsx")), "В публичных загрузках не должно оставаться XLSX"
 
 print("training assets: passed")
