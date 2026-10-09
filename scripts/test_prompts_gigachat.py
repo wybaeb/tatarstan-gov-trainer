@@ -22,18 +22,65 @@ CHAT = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
 MODEL = os.getenv("GIGACHAT_MODEL", "GigaChat")
 
 TASKS = [
-    ("показатель", ["metric", "period", "calculation_rule", "checks"], "Верни только JSON с ключами metric, period, calculation_rule, checks. Сравни полные месяцы срока обработки обезличенных обращений; используй медиану и долю в срок."),
-    ("качество", ["defects", "clarifications"], "Верни только JSON с ключами defects и clarifications. defects — непустой массив объектов field, issue, rule, priority. В учебном массиве есть повторы, пустые даты и варианты названий каналов."),
-    ("классификация", ["items", "escalation"], "Верни только JSON с ключами items и escalation. items — непустой массив объектов id, category, confidence, reason. Учебные обращения обезличены; при confidence ниже 0.70 направляй на уточнение."),
-    ("формула", ["formula", "explanation", "checks"], "Верни только JSON с ключами formula, explanation, checks. Нужна формула русской версии Excel для доли завершённых записей, где разность дат не превышает 10 дней."),
-    ("безопасность", ["confirmed_facts", "assumptions", "risks", "human_control"], "Верни только JSON с ключами confirmed_facts, assumptions, risks, human_control. Сценарий: предварительная классификация обезличенных учебных обращений. Не придумывай факты."),
-    ("пилот", ["problem", "confirmed_fact", "scope", "ai_role", "human_control", "test_set", "metric", "acceptance", "stop_conditions", "contractor_questions", "slides"], "Верни только JSON с перечисленными ключами: problem, confirmed_fact, scope, ai_role, human_control, test_set, metric, acceptance, stop_conditions, contractor_questions, slides. slides — непустой массив объектов title, key_message. Ограниченный учебный пилот классифицирует 100 обезличенных обращений; сотрудник проверяет результат."),
+    (
+        "показатель",
+        ["name", "purpose", "numerator", "denominator", "period", "exclusions", "checks"],
+        "Работай только с обезличенным учебным массивом. Управленческий вопрос: какая доля завершённых обращений уложилась в установленный срок? Поля: идентификатор; дата регистрации; дата завершения; категория; канал; статус; целевой срок. Сформируй паспорт показателя. Отдели подтверждённые правила от предположений. Верни только JSON: {\"name\":\"...\",\"purpose\":\"...\",\"numerator\":\"...\",\"denominator\":\"...\",\"period\":\"...\",\"exclusions\":[\"...\"],\"checks\":[\"...\"]}",
+    ),
+    (
+        "классификация",
+        ["items", "escalation"],
+        "Классифицируй три обезличенных учебных обращения EDU-001, EDU-002 и EDU-003. Категории: благоустройство; транспортная доступность; социальная поддержка; иное. При уверенности ниже 0.70 укажи маршрут «проверка сотрудником». Верни только JSON: {\"items\":[{\"id\":\"...\",\"category\":\"...\",\"confidence\":0.0,\"reason\":\"...\"}],\"escalation\":[{\"condition\":\"...\",\"route\":\"...\"}]}",
+    ),
+    (
+        "безопасность",
+        ["rows", "contractor_questions"],
+        "Сформируй матрицу безопасности ограниченного учебного пилота. Подтверждено: учебный массив обезличен; результат модели не является окончательным решением. Требуется проверить полноту обезличивания, порядок хранения, журнал действий и права доступа. Не придумывай факты. Верни только JSON: {\"rows\":[{\"data_category\":\"...\",\"allowed_scope\":\"...\",\"human_control\":\"...\",\"stop_condition\":\"...\"}],\"contractor_questions\":[\"...\"]}",
+    ),
+    (
+        "пилот",
+        ["passport", "slides"],
+        "Подготовь паспорт ограниченного пилота и содержание презентации защиты из шести слайдов. Пилот проверяет предварительную классификацию на 100 обезличенных учебных обращениях; ИИ предлагает категорию, сотрудник утверждает маршрут. Не добавляй неподтверждённые сведения. Верни только JSON: {\"passport\":{\"problem\":\"...\",\"scope\":\"...\",\"metric\":\"...\",\"acceptance\":\"...\",\"stop_conditions\":[\"...\"]},\"slides\":[{\"title\":\"...\",\"key_message\":\"...\"}]}",
+    ),
 ]
 
 CODE_TASKS = [
     ("VBA", [("строка Option Explicit", r"Option\s+Explicit"), ("точная строка Public Sub ProcessTrainingAppeals()", r"Public\s+Sub\s+ProcessTrainingAppeals\s*\(\s*\)"), ("чтение CurrentRegion.Value или CurrentRegion.Value2", r"CurrentRegion\.Value2?"), ("словарь Scripting.Dictionary", r"Scripting\.Dictionary"), ("разбор дат через DateSerial", r"DateSerial\s*\("), ("диаграмма через ChartObjects.Add", r"ChartObjects\.Add")], "Напиши полный модуль VBA для листа «Выгрузка» с 12 324 учебными строками. Поля: ID обращения, дата регистрации, дата завершения, канал, категория, статус, целевой срок, территориальная группа, краткое содержание. Удали полные повторы по исходным значениям; явно разбери даты ДД.ММ.ГГГГ и ГГГГ-ММ-ДД через DateSerial; нормализуй четыре канала; добавь длительность и соблюдение срока; сформируй лист «Сводка» по каналам и категориям и диаграмму. Код должен начинаться с Option Explicit и содержать точную строку Public Sub ProcessTrainingAppeals(). Всё прочитай одним CurrentRegion.Value2 в массив; используй Scripting.Dictionary; не обращайся к отдельным ячейкам в основном цикле; запиши очищенный массив одним присваиванием; создай ChartObjects.Add с xlColumnClustered. Верни только код VBA."),
     ("Apps Script", [("функция processTrainingAppeals", r"function\s+processTrainingAppeals"), ("единый диапазон getDataRange", r"getDataRange\s*\("), ("одно пакетное чтение getValues", r"getValues\s*\("), ("пакетная запись setValues", r"setValues\s*\("), ("множество Set для повторов", r"new\s+Set\s*\("), ("явное создание даты", r"new\s+Date\s*\("), ("диаграмма через newChart", r"newChart\s*\(")], "Напиши полный Google Apps Script для листа «Выгрузка» с 12 324 учебными строками и теми же девятью полями. Удали полные повторы до преобразований; явно разбери даты ДД.ММ.ГГГГ и ГГГГ-ММ-ДД; нормализуй четыре канала; добавь длительность и соблюдение срока; сформируй лист «Сводка» и столбчатую диаграмму. Требования: одна функция processTrainingAppeals; определить единый диапазон через getDataRange(), затем один раз вызвать getValues(); обработка массива в памяти с new Set(); одна запись setValues; без построчных getValue/setValue; диаграмма через newChart. Верни только код JavaScript."),
 ]
+
+
+def first_json_object(text: str) -> dict:
+    """Читает первый полный JSON-объект и игнорирует пояснение после него."""
+    decoder = json.JSONDecoder()
+    start = text.find("{")
+    if start < 0:
+        raise json.JSONDecodeError("нет объекта JSON", text, 0)
+    value, _ = decoder.raw_decode(text[start:])
+    if not isinstance(value, dict):
+        raise ValueError("верхний уровень ответа должен быть объектом")
+    return value
+
+
+def validate_nested(name: str, answer: dict) -> None:
+    schemas = {
+        "классификация": (("items", ("id", "category", "confidence", "reason")), ("escalation", ("condition", "route"))),
+        "безопасность": (("rows", ("data_category", "allowed_scope", "human_control", "stop_condition")),),
+        "пилот": (("slides", ("title", "key_message")),),
+    }
+    for list_name, row_keys in schemas.get(name, ()):
+        rows = answer.get(list_name)
+        if not isinstance(rows, list) or not rows:
+            raise ValueError(f"{list_name} должен быть непустым списком")
+        for index, row in enumerate(rows):
+            missing = [key for key in row_keys if key not in row]
+            if missing:
+                raise ValueError(f"нет {list_name}[{index}].{','.join(missing)}")
+    if name == "пилот":
+        passport = answer.get("passport", {})
+        missing = [key for key in ("problem", "scope", "metric", "acceptance", "stop_conditions") if key not in passport]
+        if missing or len(answer.get("slides", [])) != 6:
+            raise ValueError("паспорт неполон или слайдов не шесть")
 
 def main() -> int:
     key = os.getenv("GIGACHAT_AUTH_KEY", "").strip()
@@ -61,21 +108,20 @@ def main() -> int:
             continue
         try:
             text = ask(task).strip()
-            text = text[text.find("{"):text.rfind("}") + 1]
-            answer = json.loads(text)
+            answer = first_json_object(text)
             missing = [x for x in required if x not in answer]
             if missing:
-                repair = f"Исправьте ответ: добавьте обязательные ключи {', '.join(missing)}. Верните только JSON без пояснений.\n\n{text}"
+                repair = f"Исправьте ответ: добавьте обязательные ключи {', '.join(missing)}. Верните только один JSON-объект без пояснений.\n\n{text}"
                 text = ask(repair).strip()
-                text = text[text.find("{"):text.rfind("}") + 1]
-                answer = json.loads(text)
+                answer = first_json_object(text)
                 missing = [x for x in required if x not in answer]
             if missing:
                 raise ValueError("нет обязательных ключей")
+            validate_nested(name, answer)
             print(f"{name}: структура принята")
-        except (ValueError, KeyError, json.JSONDecodeError):
+        except (ValueError, KeyError, json.JSONDecodeError) as exc:
             failed.append(name)
-            print(f"{name}: структура не принята")
+            print(f"{name}: структура не принята ({type(exc).__name__}: {exc})")
 
     for name, rules, task in CODE_TASKS:
         if only and only not in name.lower():

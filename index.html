@@ -2,44 +2,30 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Практикум: данные и ИИ в государственном управлении</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="hero">
-    <p class="eyebrow">Республика Татарстан · учебный практикум</p>
-    <h1>Данные и искусственный интеллект<br>в управленческой практике</h1>
-    <p class="lead">Восемь последовательных заданий и две интерактивные лаборатории: от постановки измеримой задачи до автоматизации большой выгрузки, эксперимента и защиты пилота.</p>
-    <div class="notice">Все сведения ниже — <strong>обучающие примеры</strong>. Они не описывают фактическую работу организаций, должностных лиц или населённых пунктов.</div>
+    <div class="hero-inner">
+      <p class="eyebrow">Республика Татарстан · практическое занятие</p>
+      <h1>От данных к проверяемому управленческому решению</h1>
+      <p class="lead">Единая последовательность из девяти шагов: определить показатель, увидеть искажения, распознать циклы, проверить прогноз, оценить неопределённость, автоматизировать обработку и оформить ограниченный пилот.</p>
+      <p class="notice">Все ситуации и массивы — обезличенные обучающие примеры. Они не описывают фактическую работу организаций, территорий или должностных лиц.</p>
+    </div>
   </header>
 
-  <main>
-    <section class="method" aria-label="Порядок работы">
-      <div><b>Порядок работы</b><span>1. Заполните поля</span><span>2. Скопируйте запрос</span><span>3. Вставьте его в доступный ИИ‑сервис</span><span>4. Вставьте структурированный ответ и проверьте его</span></div>
-      <p>В учебном занятии запросы выполняются в Госпромпте. Сейчас тренажёр работает автономно: ключи доступа и рабочие данные в него не передаются.</p>
-    </section>
-    <section class="lab-grid" aria-label="Интерактивные лаборатории">
-      <a class="lab-card season" href="labs/seasonality/">
-        <span>Лаборатория 1</span><strong>Сезонные волны</strong>
-        <p>Три горизонта наблюдения трижды меняют управленческий вывод. Компоненты ряда можно накладывать по одной.</p><b>Открыть практикум →</b>
-      </a>
-      <a class="lab-card experiment" href="labs/experiment/">
-        <span>Лаборатория 2</span><strong>Доверительные интервалы</strong>
-        <p>Ранний лидер эксперимента меняется по мере накопления данных. Есть расчёт требуемой длительности.</p><b>Открыть практикум →</b>
-      </a>
-      <a class="lab-card automation" href="?case=excel#case">
-        <span>Практикум с файлами</span><strong>12 тысяч строк: Excel и Google Таблицы</strong>
-        <p>Скачайте учебную выгрузку, получите код от ИИ‑сервиса и проверьте его по обязательным требованиям.</p><b>Открыть практикум →</b>
-      </a>
-    </section>
-    <nav id="case-nav" class="case-nav" aria-label="Задания"></nav>
-    <section id="case" class="case" aria-live="polite"></section>
+  <main class="course">
+    <nav class="journey" id="journey" aria-label="Последовательность практикума"></nav>
+    <section class="stage" id="stage" aria-live="polite"></section>
+    <footer class="stage-controls">
+      <button id="prev" class="button secondary">← Предыдущий шаг</button>
+      <div><span id="position"></span><strong id="next-title"></strong></div>
+      <button id="next" class="button">Следующий шаг →</button>
+    </footer>
   </main>
-
-  <template id="field-template">
-    <label class="field"><span></span><textarea rows="3"></textarea></label>
-  </template>
   <script src="app.js"></script>
 </body>
 </html>
