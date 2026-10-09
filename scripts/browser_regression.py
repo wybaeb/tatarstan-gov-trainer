@@ -104,11 +104,21 @@ def main() -> None:
         assert "Матрица построена" in driver.find_element(By.ID, "class-status").text
         assert "проверка сотрудником" in driver.find_element(By.ID, "class-artifact").text
 
-        open_step(8, "Безопасность")
-        click(By.ID, "safe-example")
+        open_step(8, "Допустимый контур")
+        driver.find_element(By.ID, "safe-response").send_keys("Ответ без таблицы")
         click(By.ID, "safe-build")
-        assert "Матрица сформирована" in driver.find_element(By.ID, "safe-status").text
-        assert "Стоп" in driver.find_element(By.ID, "safe-artifact").text
+        assert "Не найдена таблица" in driver.find_element(By.ID, "safe-status").text
+        expected_tones = {"public": "green", "personal": "amber", "special": "red", "restricted": "red", "prohibited": "red"}
+        for scenario, tone in expected_tones.items():
+            click(By.CSS_SELECTOR, f'[data-security="{scenario}"]')
+            click(By.ID, "safe-example")
+            click(By.ID, "safe-build")
+            assert "Предварительное заключение извлечено" in driver.find_element(By.ID, "safe-status").text
+            assert driver.find_elements(By.CSS_SELECTOR, f".security-card.{tone}")
+            artifact_text = driver.find_element(By.ID, "safe-artifact").text
+            assert "Не делать" in artifact_text and "Сделать" in artifact_text
+            assert "Вопросы уполномоченному специалисту" in artifact_text
+        assert "реальные персональные" in driver.find_element(By.CSS_SELECTOR, ".safety-note").text
 
         open_step(9, "презентацию защиты")
         click(By.ID, "pilot-example")
