@@ -23,8 +23,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      - name: Prepare public learning materials
+        run: |
+          mkdir -p _site
+          cp *.html *.js *.css *.svg _site/
+          cp -R data downloads labs _site/
+          touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
