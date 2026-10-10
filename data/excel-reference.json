@@ -1,0 +1,102 @@
+{
+  "rows": 20454,
+  "source_last_row": 20455,
+  "monthly": [
+    {
+      "month": "2025-01",
+      "count": 1500,
+      "days": 31,
+      "per_day": 48.38709677419355,
+      "rolling30_month_mean": 1460.0,
+      "rolling_day_mean": 48.666666666666664
+    },
+    {
+      "month": "2025-02",
+      "count": 1710,
+      "days": 28,
+      "per_day": 61.07142857142857,
+      "rolling30_month_mean": 1642.392857142857,
+      "rolling_day_mean": 54.746428571428574
+    },
+    {
+      "month": "2025-03",
+      "count": 1575,
+      "days": 31,
+      "per_day": 50.806451612903224,
+      "rolling30_month_mean": 1662.8387096774193,
+      "rolling_day_mean": 55.427956989247306
+    },
+    {
+      "month": "2025-04",
+      "count": 1510,
+      "days": 30,
+      "per_day": 50.333333333333336,
+      "rolling30_month_mean": 1518.2666666666667,
+      "rolling_day_mean": 50.60888888888889
+    },
+    {
+      "month": "2025-05",
+      "count": 1630,
+      "days": 31,
+      "per_day": 52.58064516129032,
+      "rolling30_month_mean": 1544.2903225806451,
+      "rolling_day_mean": 51.476344086021506
+    },
+    {
+      "month": "2025-06",
+      "count": 1580,
+      "days": 30,
+      "per_day": 52.666666666666664,
+      "rolling30_month_mean": 1580.1666666666667,
+      "rolling_day_mean": 52.672222222222224
+    },
+    {
+      "month": "2025-07",
+      "count": 1490,
+      "days": 31,
+      "per_day": 48.064516129032256,
+      "rolling30_month_mean": 1503.9032258064517,
+      "rolling_day_mean": 50.13010752688172
+    },
+    {
+      "month": "2025-08",
+      "count": 1620,
+      "days": 31,
+      "per_day": 52.25806451612903,
+      "rolling30_month_mean": 1509.0967741935483,
+      "rolling_day_mean": 50.30322580645161
+    },
+    {
+      "month": "2025-09",
+      "count": 1570,
+      "days": 30,
+      "per_day": 52.333333333333336,
+      "rolling30_month_mean": 1571.9333333333334,
+      "rolling_day_mean": 52.39777777777778
+    },
+    {
+      "month": "2025-10",
+      "count": 1650,
+      "days": 31,
+      "per_day": 53.225806451612904,
+      "rolling30_month_mean": 1581.1612903225807,
+      "rolling_day_mean": 52.70537634408603
+    },
+    {
+      "month": "2025-11",
+      "count": 1510,
+      "days": 30,
+      "per_day": 50.333333333333336,
+      "rolling30_month_mean": 1554.8333333333333,
+      "rolling_day_mean": 51.827777777777776
+    },
+    {
+      "month": "2025-12",
+      "count": 1590,
+      "days": 31,
+      "per_day": 51.29032258064516,
+      "rolling30_month_mean": 1523.0,
+      "rolling_day_mean": 50.766666666666666
+    }
+  ]
+}
